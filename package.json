@@ -1,0 +1,55 @@
+{
+  "name": "biscozum",
+  "displayName": "MobkitExtension",
+  "description": "Flutter Code Generation",
+  "version": "0.0.1",
+  "publisher": "bis-cozum",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Biscozum/mobkitextension.git"
+  },
+  "engines": {
+    "vscode": "^1.54.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:biscozum.addAnnotation",
+    "onCommand:biscozum.buildrunner"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "biscozum.addAnnotation",
+        "title": "Add Annotation",
+        "category": "MobkitExtension"
+      },
+      {
+        "command": "biscozum.buildrunner",
+        "title": "Build Runner",
+        "category": "MobkitExtension"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.54.0",
+    "@vscode/test-electron": "^2.1.5",
+    "eslint": "^8.24.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "await-catcher": "^1.1.2"
+  }
+}
