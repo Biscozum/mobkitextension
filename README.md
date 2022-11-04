@@ -1,10 +1,12 @@
 # MobkitExtension
 
-MobkitExtension is code generation tool that creates functions to help you code Flutter.
+MobkitExtension is code generation tool that creates functions to help you code Flutter. It allows you to get the values ​​you give to your enums. Flutter currently does not support this functionality.
 
 # Usage
 
 It was created to facilitate the use of the mobkit_generator package published on pub.dev for Flutter.
+
+If you've already added annotations like `@JsonValue` to your enums, you don't need to use this extension. You can just use the `build runner` function.
 
 ## Installation
 

@@ -37,11 +37,14 @@ async function activate(context) {
 			textDoxSplited = textDoxSplited.replace("),", ")");
 		}
 		let textLast = textDoxSplited.split("';");
-		do {
-			str += textLast[i] + "'; \n";
-			i++
+		if (textLast[i].split(" ")[0] == 'import') {
+			do {
+				str += textLast[i] + "'; \n";
+				i++
+			}
+			while (textLast[i].split(" ")[0] == 'import');
 		}
-		while (textLast[i].split(" ")[0] == 'import');
+
 		let documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
 		let documentNameEdited = documentName[documentName.length - 1].replace(".dart", "");
 		str += "import 'package:mobkit_generator/annotations.dart';\n";
