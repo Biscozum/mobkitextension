@@ -8,7 +8,7 @@ It was created to facilitate the use of the mobkit_generator package published o
 
 If you've already added annotations like `@JsonValue` to your enums, you don't need to use this extension. You can just use the `build runner` function.
 
-## Installation
+# Installation
 
 To install the extension just execute the following command:
 
@@ -16,17 +16,17 @@ To install the extension just execute the following command:
 
 You may also install the extension from the [ visual studio code marketplace.](https://marketplace.visualstudio.com/)
 
-## Getting started
+# Getting started
 1. Install the extension
 2. Open your project, open the command palette and find the `MobkitExtension Add Annotation` command.
 3. Select the data type for the Annotation you want to add.
 
-## Commands
+# Commands
 
-#### MobkitExtension: Add Annotation
+## MobkitExtension: Add Annotation
 
 It creates the appropriate structure for the MobkitExtension by adding the `@EnumSerializable` and `@EnumValue` annotations.
 
-#### MobkitExtension: Build Runner
+## MobkitExtension: Build Runner
 
 Type the necessary command to the terminal to run the MobkitGenerator plugin.
