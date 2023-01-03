@@ -5,16 +5,27 @@ const vscode = require('vscode');
  */
 async function activate(context) {
 	console.log('Congratulations, your extension "MobkitGenerator" is now active!');
-	let answer;
+	let typeAnswer;
+	let descriptionAnswer;
 	let setTextData = vscode.commands.registerCommand('biscozum.addAnnotation', async function () {
-		answer = await vscode.window.showQuickPick(
+		typeAnswer = await vscode.window.showQuickPick(
 			[
 				{ label: 'string', description: 'Type', detail: 'A value of type String' },
 				{ label: 'int', description: 'Type', detail: 'A value of type Int' }
 			],
 			{ placeHolder: 'You must specify a type for the annotation you want to add.' });
-		if (answer == null) {
+		if (typeAnswer == null) {
 			await vscode.window.showInformationMessage("You must specify a type for the annotation you want to add.");
+			return;
+		}
+		descriptionAnswer = await vscode.window.showQuickPick(
+			[
+				{ label: 'Yes', description: 'yes', detail: "I want to get the enum's description" },
+				{ label: 'No', description: 'no', detail: "I don't want to get the enum's description" }
+			],
+			{ placeHolder: 'You have to specify if you want to get annotation with enums' });
+		if (descriptionAnswer == null) {
+			await vscode.window.showInformationMessage("You have to specify if you want to get annotation with enums");
 			return;
 		}
 		let textDoc = vscode.window.activeTextEditor?.document.getText().toString();
@@ -44,34 +55,73 @@ async function activate(context) {
 			}
 			while (textLast[i].split(" ")[0] == 'import');
 		}
-
-		let documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
+		let documentName = [];
+		if (vscode.window.activeTextEditor?.document.fileName.includes("\\")) {
+			vscode.window.activeTextEditor?.document.fileName.split("\\");
+		}
+		if (vscode.window.activeTextEditor?.document.fileName.includes("/")) {
+			vscode.window.activeTextEditor?.document.fileName.split("/");
+		}
+		documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
 		let documentNameEdited = documentName[documentName.length - 1].replace(".dart", "");
 		str += "import 'package:mobkit_generator/annotations.dart';\n";
 		str += "part '" + documentNameEdited + ".g.dart';\n";
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
-			if (answer.label == "string") {
+			if (typeAnswer.label == "string") {
 				str += "@EnumSerializable(String)\n";
 			}
-			else if (answer.label = "int") {
+			else if (typeAnswer.label = "int") {
 				str += "@EnumSerializable(int)\n";
 			}
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
-			for (var z = 0; z < enumValue.length - 1; z++) {
-				if (enumValue[z].toString() != "}" || enumValue[z].toString() != "{") {
-					if (answer.label == "string") {
-						str += "	@EnumValue('0')\n";
-						str += enumValue[z] + ",\n";
+			for (var z = 0; z < enumValue.length; z++) {
+				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{") {
+					if (descriptionAnswer.label == "Yes") {
+						if (typeAnswer.label == "string") {
+							str += "	@EnumValue({'0',''})\n";
+							if (z == enumValue.length - 1) {
+								str += enumValue[z] + "\n";
+							} else {
+								str += enumValue[z] + ",\n";
+							}
+						}
+						else if (typeAnswer.label == "int") {
+							str += "	@EnumValue({0,''})\n";
+							if (z == enumValue.length - 1) {
+								str += enumValue[z] + "\n";
+							}
+							else {
+								str += enumValue[z] + ",\n";
+							}
+						}
 					}
-					else if (answer.label == "int") {
-						str += "	@EnumValue(0)\n";
-						str += enumValue[z] + ",\n";
+					else {
+						if (typeAnswer.label == "string") {
+							str += "	@EnumValue('0')\n";
+							if (z == enumValue.length - 1) {
+								str += enumValue[z] + "\n";
+							} else {
+								str += enumValue[z] + ",\n";
+							}
+						}
+						else if (typeAnswer.label == "int") {
+							str += "	@EnumValue(0)\n";
+							if (z == enumValue.length - 1) {
+								str += enumValue[z] + "\n";
+							}
+							else {
+								str += enumValue[z] + ",\n";
+							}
+						}
 					}
+
 				}
 			}
-			str += "}";
+			if (str[str.length - 2] != "}") {
+				str += "}";
+			}
 		}
 		await vscode.commands.executeCommand('editor.action.selectAll');
 		await vscode.commands.executeCommand('editor.action.clipboardCutAction');
