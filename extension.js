@@ -80,77 +80,45 @@ async function activate(context) {
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
 			if (typeAnswer.label == "string" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(String, true)\n";
-			}
-			else if (typeAnswer.label == "string" && descriptionAnswer.label == 'No') {
-				str += "@EnumSerializable(String, false)\n";
+				str += "@EnumSerializable(String, [])\n";
 			}
 			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(int, true)\n";
+				str += "@EnumSerializable(int, [])\n";
 			}
-			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'No') {
-				str += "@EnumSerializable(int, false)\n";
-			}
+
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
+			let index = 0;
 			for (var z = 0; z < enumValue.length; z++) {
 				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{" && enumValue[z].toString() != "  ") {
-					if (descriptionAnswer.label == "Yes") {
-						if (typeAnswer.label == "string") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue({'0',''})\n";
-							}
-							else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue({'0',''})\n";
-							}
-							if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							} else {
-								str += enumValue[z] + ",\n";
-							}
+					index++;
+					if (typeAnswer.label == "string") {
+						if (annotationAnswer.label == "EnumValue") {
+							str += "	@EnumValue('" + index + "')\n";
 						}
-						else if (typeAnswer.label == "int") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue({0,''})\n";
-							}
-							else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue({0,''})\n";
-							}
-							if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							}
-							else {
-								str += enumValue[z] + ",\n";
-							}
+						else if (annotationAnswer.label == "JsonValue") {
+							str += "	@JsonValue('" + index + "')\n";
+						}
+						if (z == enumValue.length - 1) {
+							str += enumValue[z] + "\n";
+						} else {
+							str += enumValue[z] + ",\n";
 						}
 					}
-					else {
-						if (typeAnswer.label == "string") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue('0')\n";
-							} else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue('0')\n";
-							}
-							if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							} else {
-								str += enumValue[z] + ",\n";
-							}
+					else if (typeAnswer.label == "int") {
+						if (annotationAnswer.label == "EnumValue") {
+							str += "	@EnumValue(" + index + ")\n";
 						}
-						else if (typeAnswer.label == "int") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue(0)\n";
-							} else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue(0)\n";
-							} if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							}
-							else {
-								str += enumValue[z] + ",\n";
-							}
+						else if (annotationAnswer.label == "JsonValue") {
+							str += "	@JsonValue(" + index + ")\n";
+						}
+						if (z == enumValue.length - 1) {
+							str += enumValue[z] + "\n";
+						}
+						else {
+							str += enumValue[z] + ",\n";
 						}
 					}
-
 				}
 			}
 			if (str[str.length - 2] != "}") {
