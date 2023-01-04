@@ -75,7 +75,7 @@ async function activate(context) {
 		}
 		documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
 		let documentNameEdited = documentName[documentName.length - 1].replace(".dart", "");
-		str += "import 'package:mobkit_generator/annotations.dart';\n";
+		str += "import 'package:mobkit_enum_generator/annotations.dart';\n";
 		str += "part '" + documentNameEdited + ".g.dart';\n";
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
