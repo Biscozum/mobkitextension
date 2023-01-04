@@ -7,6 +7,7 @@ async function activate(context) {
 	console.log('Congratulations, your extension "MobkitGenerator" is now active!');
 	let typeAnswer;
 	let descriptionAnswer;
+	let annotationAnswer;
 	let setTextData = vscode.commands.registerCommand('biscozum.addAnnotation', async function () {
 		typeAnswer = await vscode.window.showQuickPick(
 			[
@@ -23,9 +24,19 @@ async function activate(context) {
 				{ label: 'Yes', description: 'yes', detail: "I want to get the enum's description" },
 				{ label: 'No', description: 'no', detail: "I don't want to get the enum's description" }
 			],
-			{ placeHolder: 'You have to specify if you want to get annotation with enums' });
+			{ placeHolder: 'You have to specify if you want to get annotation with enums.' });
 		if (descriptionAnswer == null) {
 			await vscode.window.showInformationMessage("You have to specify if you want to get annotation with enums");
+			return;
+		}
+		annotationAnswer = await vscode.window.showQuickPick(
+			[
+				{ label: 'EnumValue', description: 'EnumValue', detail: "EnumValue will be added as annotation to your Enum." },
+				{ label: 'JsonValue', description: 'JsonValue', detail: "JsonValue will be added as annotation to your Enum." }
+			],
+			{ placeHolder: 'You have to decide which annotation to add.' });
+		if (annotationAnswer == null) {
+			await vscode.window.showInformationMessage("You have to decide which annotation to add.");
 			return;
 		}
 		let textDoc = vscode.window.activeTextEditor?.document.getText().toString();
@@ -86,7 +97,12 @@ async function activate(context) {
 				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{" && enumValue[z].toString() != "  ") {
 					if (descriptionAnswer.label == "Yes") {
 						if (typeAnswer.label == "string") {
-							str += "	@EnumValue({'0',''})\n";
+							if (annotationAnswer.label = "EnumValue") {
+								str += "	@EnumValue({'0',''})\n";
+							}
+							else if (annotationAnswer.label = "JsonValue") {
+								str += "	@JsonValue({'0',''})\n";
+							}
 							if (z == enumValue.length - 1) {
 								str += enumValue[z] + "\n";
 							} else {
@@ -94,7 +110,12 @@ async function activate(context) {
 							}
 						}
 						else if (typeAnswer.label == "int") {
-							str += "	@EnumValue({0,''})\n";
+							if (annotationAnswer.label == "EnumValue") {
+								str += "	@EnumValue({0,''})\n";
+							}
+							else if (annotationAnswer.label == "JsonValue") {
+								str += "	@JsonValue({0,''})\n";
+							}
 							if (z == enumValue.length - 1) {
 								str += enumValue[z] + "\n";
 							}
@@ -105,7 +126,11 @@ async function activate(context) {
 					}
 					else {
 						if (typeAnswer.label == "string") {
-							str += "	@EnumValue('0')\n";
+							if (annotationAnswer.label = "EnumValue") {
+								str += "	@EnumValue('0')\n";
+							} else if (annotationAnswer.label == "JsonValue") {
+								str += "	@JsonValue('0')\n";
+							}
 							if (z == enumValue.length - 1) {
 								str += enumValue[z] + "\n";
 							} else {
@@ -113,8 +138,11 @@ async function activate(context) {
 							}
 						}
 						else if (typeAnswer.label == "int") {
-							str += "	@EnumValue(0)\n";
-							if (z == enumValue.length - 1) {
+							if (annotationAnswer.label = "EnumValue") {
+								str += "	@EnumValue(0)\n";
+							} else if (annotationAnswer.label == "JsonValue") {
+								str += "	@JsonValue(0)\n";
+							} if (z == enumValue.length - 1) {
 								str += enumValue[z] + "\n";
 							}
 							else {

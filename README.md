@@ -19,7 +19,9 @@ You may also install the extension from the [ visual studio code marketplace.](h
 # Getting started
 1. Install the extension
 2. Open your project, open the command palette and find the `MobkitExtension Add Annotation` command.
-3. Select the data type for the Annotation you want to add.
+3. You must specify a type for the annotation you want to add.
+4. You have to specify if you want to get annotation with enums.
+5. You have to decide which annotation to add.
 
 # Commands
 
