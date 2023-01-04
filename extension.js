@@ -83,7 +83,7 @@ async function activate(context) {
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
 			for (var z = 0; z < enumValue.length; z++) {
-				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{") {
+				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{" && enumValue[z].toString() != "  ") {
 					if (descriptionAnswer.label == "Yes") {
 						if (typeAnswer.label == "string") {
 							str += "	@EnumValue({'0',''})\n";
