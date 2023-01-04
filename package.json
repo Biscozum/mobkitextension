@@ -2,7 +2,7 @@
   "name": "biscozum",
   "displayName": "MobkitExtension",
   "description": "Flutter Code Generation",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "publisher": "bis-cozum",
   "repository": {
     "type": "git",
@@ -16,7 +16,8 @@
   ],
   "activationEvents": [
     "onCommand:biscozum.addAnnotation",
-    "onCommand:biscozum.buildrunner"
+    "onCommand:biscozum.buildrunner",
+    "onCommand:biscozum.classToJsonSerializable"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -29,6 +30,11 @@
       {
         "command": "biscozum.buildrunner",
         "title": "Build Runner",
+        "category": "MobkitExtension"
+      },
+      {
+        "command": "biscozum.classToJsonSerializable",
+        "title": "Class to JsonSerializable",
         "category": "MobkitExtension"
       }
     ]

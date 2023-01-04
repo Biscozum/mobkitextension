@@ -5,10 +5,11 @@ const vscode = require('vscode');
  */
 async function activate(context) {
 	console.log('Congratulations, your extension "MobkitGenerator" is now active!');
-	let typeAnswer;
-	let descriptionAnswer;
-	let annotationAnswer;
+
 	let setTextData = vscode.commands.registerCommand('biscozum.addAnnotation', async function () {
+		let typeAnswer;
+		let descriptionAnswer;
+		let annotationAnswer;
 		typeAnswer = await vscode.window.showQuickPick(
 			[
 				{ label: 'string', description: 'Type', detail: 'A value of type String' },
@@ -80,77 +81,45 @@ async function activate(context) {
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
 			if (typeAnswer.label == "string" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(String, true)\n";
-			}
-			else if (typeAnswer.label == "string" && descriptionAnswer.label == 'No') {
-				str += "@EnumSerializable(String, false)\n";
+				str += "@EnumSerializable(String, [])\n";
 			}
 			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(int, true)\n";
+				str += "@EnumSerializable(int, [])\n";
 			}
-			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'No') {
-				str += "@EnumSerializable(int, false)\n";
-			}
+
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
+			let index = 0;
 			for (var z = 0; z < enumValue.length; z++) {
 				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{" && enumValue[z].toString() != "  ") {
-					if (descriptionAnswer.label == "Yes") {
-						if (typeAnswer.label == "string") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue({'0',''})\n";
-							}
-							else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue({'0',''})\n";
-							}
-							if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							} else {
-								str += enumValue[z] + ",\n";
-							}
+					index++;
+					if (typeAnswer.label == "string") {
+						if (annotationAnswer.label == "EnumValue") {
+							str += "	@EnumValue('" + index + "')\n";
 						}
-						else if (typeAnswer.label == "int") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue({0,''})\n";
-							}
-							else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue({0,''})\n";
-							}
-							if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							}
-							else {
-								str += enumValue[z] + ",\n";
-							}
+						else if (annotationAnswer.label == "JsonValue") {
+							str += "	@JsonValue('" + index + "')\n";
+						}
+						if (z == enumValue.length - 1) {
+							str += enumValue[z] + "\n";
+						} else {
+							str += enumValue[z] + ",\n";
 						}
 					}
-					else {
-						if (typeAnswer.label == "string") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue('0')\n";
-							} else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue('0')\n";
-							}
-							if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							} else {
-								str += enumValue[z] + ",\n";
-							}
+					else if (typeAnswer.label == "int") {
+						if (annotationAnswer.label == "EnumValue") {
+							str += "	@EnumValue(" + index + ")\n";
 						}
-						else if (typeAnswer.label == "int") {
-							if (annotationAnswer.label == "EnumValue") {
-								str += "	@EnumValue(0)\n";
-							} else if (annotationAnswer.label == "JsonValue") {
-								str += "	@JsonValue(0)\n";
-							} if (z == enumValue.length - 1) {
-								str += enumValue[z] + "\n";
-							}
-							else {
-								str += enumValue[z] + ",\n";
-							}
+						else if (annotationAnswer.label == "JsonValue") {
+							str += "	@JsonValue(" + index + ")\n";
+						}
+						if (z == enumValue.length - 1) {
+							str += enumValue[z] + "\n";
+						}
+						else {
+							str += enumValue[z] + ",\n";
 						}
 					}
-
 				}
 			}
 			if (str[str.length - 2] != "}") {
@@ -168,9 +137,137 @@ async function activate(context) {
 		const terminal = vscode.window.activeTerminal;
 		terminal.sendText("flutter packages pub run build_runner build --delete-conflicting-outputs \n");
 	});
+
+	let classToJsonSerializable = vscode.commands.registerCommand('biscozum.classToJsonSerializable', async function () {
+		let textDoc = vscode.window.activeTextEditor?.document.getText().toString();
+		let textDoxSplited = textDoc?.trim().split('\r\n').toString();
+		let str = "";
+		var i = 0;
+		while (textDoxSplited.includes(";,")) {
+			textDoxSplited = textDoxSplited.replace(";,", ";");
+		}
+		while (textDoxSplited.includes("},")) {
+			textDoxSplited = textDoxSplited.replace("},", "}");
+		}
+		while (textDoxSplited.includes("{,")) {
+			textDoxSplited = textDoxSplited.replace("{,", "{");
+		}
+		while (textDoxSplited.includes(",,")) {
+			textDoxSplited = textDoxSplited.replace(",,", ",");
+		}
+		while (textDoxSplited.includes("),")) {
+			textDoxSplited = textDoxSplited.replace("),", ")");
+		} while (textDoxSplited.includes("(,")) {
+			textDoxSplited = textDoxSplited.replace("(,", "(");
+		}
+		let textLast = textDoxSplited.split("';");
+		if (textLast[i].split(" ")[0] == 'import') {
+			do {
+				str += textLast[i] + "'; \n";
+				i++
+			}
+			while (textLast[i].split(" ")[0] == 'import');
+		}
+		let documentName = [];
+		if (vscode.window.activeTextEditor?.document.fileName.includes("\\")) {
+			vscode.window.activeTextEditor?.document.fileName.split("\\");
+		}
+		if (vscode.window.activeTextEditor?.document.fileName.includes("/")) {
+			vscode.window.activeTextEditor?.document.fileName.split("/");
+		}
+		documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
+		let documentNameEdited = documentName[documentName.length - 1].replace(".dart", "");
+		str += "import 'package:mobkit_enum_generator/annotations.dart';\n";
+		str += "part '" + documentNameEdited + ".g.dart';\n";
+		str += "\n";
+		str += "@JsonSerializable()\n";
+
+		let classList = textLast[textLast.length - 1].split("class ");
+		for (var k = 1; k < classList.length; k++) {
+			str += "class " + classList[k].split("{")[0] + "{\n";
+			let classValue = classList[k].split("{")[1].split(';');
+			let index = 0;
+			for (var z = 0; z < classValue.length; z++) {
+				if (classValue[z].toString() != "}" && classValue[z].toString() != "{" && classValue[z].toString() != "  " && classValue[z].replace(/\s/g, '').toString() != ",") {
+					index++;
+					let isIncludeClass = classValue.includes("    " + classList[k].split("{")[0].replace(" ", "") + "(,")
+					if (isIncludeClass == true) {
+						str += classValue[z] + "\n";
+					}
+					if (z == classValue.length - 1) {
+						str += classValue[z] + "\n";
+					} else {
+						str += classValue[z] + ";\n";
+					}
+				}
+			}
+			str += "factory " + classList[k].split("{")[0].replace(" ", "") + ".fromJson(Map<String, dynamic> json) => _$" + classList[k].split("{")[0].replace(" ", "") + "FromJson(json);\n";
+			str += "Map<String,dynamic> toJson() => _$" + classList[k].split("{")[0].replace(" ", "") + "ToJson(this);\n";
+		}
+		str += "}\n";
+
+
+		// let enumList = textLast[textLast.length - 1].split("enum ");
+		// for (var k = 1; k < enumList.length; k++) {
+		// 	if (typeAnswer.label == "string" && descriptionAnswer.label == 'Yes') {
+		// 		str += "@EnumSerializable(String, [])\n";
+		// 	}
+		// 	else if (typeAnswer.label == "int" && descriptionAnswer.label == 'Yes') {
+		// 		str += "@EnumSerializable(int, [])\n";
+		// 	}
+
+		// 	str += "enum " + enumList[k].split("{")[0] + "{\n";
+		// 	let enumValue = enumList[k].split("{")[1].split(',');
+		// 	let index = 0;
+		// 	for (var z = 0; z < enumValue.length; z++) {
+		// 		if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{" && enumValue[z].toString() != "  ") {
+		// 			index++;
+		// 			if (typeAnswer.label == "string") {
+		// 				if (annotationAnswer.label == "EnumValue") {
+		// 					str += "	@EnumValue('" + index + "')\n";
+		// 				}
+		// 				else if (annotationAnswer.label == "JsonValue") {
+		// 					str += "	@JsonValue('" + index + "')\n";
+		// 				}
+		// 				if (z == enumValue.length - 1) {
+		// 					str += enumValue[z] + "\n";
+		// 				} else {
+		// 					str += enumValue[z] + ",\n";
+		// 				}
+		// 			}
+		// 			else if (typeAnswer.label == "int") {
+		// 				if (annotationAnswer.label == "EnumValue") {
+		// 					str += "	@EnumValue(" + index + ")\n";
+		// 				}
+		// 				else if (annotationAnswer.label == "JsonValue") {
+		// 					str += "	@JsonValue(" + index + ")\n";
+		// 				}
+		// 				if (z == enumValue.length - 1) {
+		// 					str += enumValue[z] + "\n";
+		// 				}
+		// 				else {
+		// 					str += enumValue[z] + ",\n";
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	if (str[str.length - 2] != "}") {
+		// 		str += "}";
+		// 	}
+		// }
+		await vscode.commands.executeCommand('editor.action.selectAll');
+		await vscode.commands.executeCommand('editor.action.clipboardCutAction');
+		const editor = vscode.window.activeTextEditor;
+		await editor.edit(async editBuilder => {
+			editBuilder.insert(new vscode.Position(0, 0), str);
+		});
+	});
 	context.subscriptions.push(setTextData);
+	context.subscriptions.push(classToJsonSerializable);
 	context.subscriptions.push(runCommand);
 }
+
+
 
 module.exports = {
 	activate,
