@@ -68,11 +68,17 @@ async function activate(context) {
 		str += "part '" + documentNameEdited + ".g.dart';\n";
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
-			if (typeAnswer.label == "string") {
-				str += "@EnumSerializable(String)\n";
+			if (typeAnswer.label == "string" && descriptionAnswer.label == 'Yes') {
+				str += "@EnumSerializable(String, true)\n";
 			}
-			else if (typeAnswer.label = "int") {
-				str += "@EnumSerializable(int)\n";
+			else if (typeAnswer.label == "string" && descriptionAnswer.label == 'No') {
+				str += "@EnumSerializable(String, false)\n";
+			}
+			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'Yes') {
+				str += "@EnumSerializable(int, true)\n";
+			}
+			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'No') {
+				str += "@EnumSerializable(int, false)\n";
 			}
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
