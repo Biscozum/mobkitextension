@@ -97,10 +97,10 @@ async function activate(context) {
 				if (enumValue[z].toString() != "}" && enumValue[z].toString() != "{" && enumValue[z].toString() != "  ") {
 					if (descriptionAnswer.label == "Yes") {
 						if (typeAnswer.label == "string") {
-							if (annotationAnswer.label = "EnumValue") {
+							if (annotationAnswer.label == "EnumValue") {
 								str += "	@EnumValue({'0',''})\n";
 							}
-							else if (annotationAnswer.label = "JsonValue") {
+							else if (annotationAnswer.label == "JsonValue") {
 								str += "	@JsonValue({'0',''})\n";
 							}
 							if (z == enumValue.length - 1) {
@@ -126,7 +126,7 @@ async function activate(context) {
 					}
 					else {
 						if (typeAnswer.label == "string") {
-							if (annotationAnswer.label = "EnumValue") {
+							if (annotationAnswer.label == "EnumValue") {
 								str += "	@EnumValue('0')\n";
 							} else if (annotationAnswer.label == "JsonValue") {
 								str += "	@JsonValue('0')\n";
@@ -138,7 +138,7 @@ async function activate(context) {
 							}
 						}
 						else if (typeAnswer.label == "int") {
-							if (annotationAnswer.label = "EnumValue") {
+							if (annotationAnswer.label == "EnumValue") {
 								str += "	@EnumValue(0)\n";
 							} else if (annotationAnswer.label == "JsonValue") {
 								str += "	@JsonValue(0)\n";
