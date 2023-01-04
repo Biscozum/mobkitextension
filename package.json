@@ -16,7 +16,8 @@
   ],
   "activationEvents": [
     "onCommand:biscozum.addAnnotation",
-    "onCommand:biscozum.buildrunner"
+    "onCommand:biscozum.buildrunner",
+    "onCommand:biscozum.classToJsonSerializable"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -29,6 +30,11 @@
       {
         "command": "biscozum.buildrunner",
         "title": "Build Runner",
+        "category": "MobkitExtension"
+      },
+      {
+        "command": "biscozum.classToJsonSerializable",
+        "title": "Class to JsonSerializable",
         "category": "MobkitExtension"
       }
     ]
