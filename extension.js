@@ -80,13 +80,22 @@ async function activate(context) {
 		str += "part '" + documentNameEdited + ".g.dart';\n";
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
-			if (typeAnswer.label == "string" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(String, [])\n";
+			if (typeAnswer.label == "string") {
+				if (descriptionAnswer.label == 'Yes') {
+					str += "@EnumSerializable(String, [])\n";
+				}
+				else {
+					str += "@EnumSerializable(String, null)\n";
+				}
 			}
-			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(int, [])\n";
+			else if (typeAnswer.label == "int") {
+				if (descriptionAnswer.label == 'Yes') {
+					str += "@EnumSerializable(int, [])\n";
+				}
+				else {
+					str += "@EnumSerializable(int, null)\n";
+				}
 			}
-
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
 			let index = 0;
@@ -183,7 +192,7 @@ async function activate(context) {
 		}
 		documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
 		let documentNameEdited = documentName[documentName.length - 1].replace(".dart", "");
-		if (isJsonImported) {
+		if (!isJsonImported) {
 			str += "import 'package:json_annotation/json_annotation.dart';\n";
 		}
 		str += "\n";
