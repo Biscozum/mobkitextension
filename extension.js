@@ -80,13 +80,22 @@ async function activate(context) {
 		str += "part '" + documentNameEdited + ".g.dart';\n";
 		let enumList = textLast[textLast.length - 1].split("enum ");
 		for (var k = 1; k < enumList.length; k++) {
-			if (typeAnswer.label == "string" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(String, [])\n";
+			if (typeAnswer.label == "string") {
+				if (descriptionAnswer.label == 'Yes') {
+					str += "@EnumSerializable(String, [])\n";
+				}
+				else {
+					str += "@EnumSerializable(String, null)\n";
+				}
 			}
-			else if (typeAnswer.label == "int" && descriptionAnswer.label == 'Yes') {
-				str += "@EnumSerializable(int, [])\n";
+			else if (typeAnswer.label == "int") {
+				if (descriptionAnswer.label == 'Yes') {
+					str += "@EnumSerializable(int, [])\n";
+				}
+				else {
+					str += "@EnumSerializable(int, null)\n";
+				}
 			}
-
 			str += "enum " + enumList[k].split("{")[0] + "{\n";
 			let enumValue = enumList[k].split("{")[1].split(',');
 			let index = 0;
@@ -161,9 +170,15 @@ async function activate(context) {
 			textDoxSplited = textDoxSplited.replace("(,", "(");
 		}
 		let textLast = textDoxSplited.split("';");
+		let isJsonImported = false;
 		if (textLast[i].split(" ")[0] == 'import') {
 			do {
-				str += textLast[i] + "'; \n";
+
+				if (textLast[i].replace("import ", '').replace(/\s/g, '') != "'package:json_annotation/json_annotation.dart") {
+					str += textLast[i] + "'; \n";
+				} else {
+					isJsonImported = true;
+				}
 				i++
 			}
 			while (textLast[i].split(" ")[0] == 'import');
@@ -177,23 +192,28 @@ async function activate(context) {
 		}
 		documentName = vscode.window.activeTextEditor?.document.fileName.split("\\");
 		let documentNameEdited = documentName[documentName.length - 1].replace(".dart", "");
-		str += "import 'package:mobkit_enum_generator/annotations.dart';\n";
+		if (!isJsonImported) {
+			str += "import 'package:json_annotation/json_annotation.dart';\n";
+		}
+		str += "\n";
 		str += "part '" + documentNameEdited + ".g.dart';\n";
 		str += "\n";
 		str += "@JsonSerializable()\n";
-
+		let className = "";
 		let classList = textLast[textLast.length - 1].split("class ");
+		if (classList[1].split("{")[0].replace(" ", "").includes("extends")) {
+			className = classList[1].split("{")[0].replace(" ", "").split("extends")[0];
+		} else {
+			className = classList[1].split("{")[0].replace(" ", "");
+		}
+
 		for (var k = 1; k < classList.length; k++) {
 			str += "class " + classList[k].split("{")[0] + "{\n";
-			let classValue = classList[k].split("{")[1].split(';');
+			let classValue = classList[k].split(" { ")[1].split(';');
 			let index = 0;
 			for (var z = 0; z < classValue.length; z++) {
 				if (classValue[z].toString() != "}" && classValue[z].toString() != "{" && classValue[z].toString() != "  " && classValue[z].replace(/\s/g, '').toString() != ",") {
 					index++;
-					let isIncludeClass = classValue.includes("    " + classList[k].split("{")[0].replace(" ", "") + "(,")
-					if (isIncludeClass == true) {
-						str += classValue[z] + "\n";
-					}
 					if (z == classValue.length - 1) {
 						str += classValue[z] + "\n";
 					} else {
@@ -201,8 +221,8 @@ async function activate(context) {
 					}
 				}
 			}
-			str += "factory " + classList[k].split("{")[0].replace(" ", "") + ".fromJson(Map<String, dynamic> json) => _$" + classList[k].split("{")[0].replace(" ", "") + "FromJson(json);\n";
-			str += "Map<String,dynamic> toJson() => _$" + classList[k].split("{")[0].replace(" ", "") + "ToJson(this);\n";
+			str += "factory " + className + ".fromJson(Map<String, dynamic> json) => _$" + className + "FromJson(json);\n";
+			str += "Map<String,dynamic> toJson() => _$" + className + "ToJson(this);\n";
 		}
 		str += "}\n";
 
